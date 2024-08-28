@@ -1,0 +1,30 @@
+#Sesion_Modal{
+    height: 100vh;
+    background-color: rgb(109, 109, 109);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    form {
+        background-color: rgb(58, 58, 58);
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        font-size: 2rem;
+        color: white;
+        border: 2px solid #000;
+        border-radius: 10px;
+    }
+
+    #confirm{
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+}

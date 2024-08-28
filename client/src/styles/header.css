@@ -1,0 +1,41 @@
+#header{
+    display: flex;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #0000002a;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
+    height: 50px;
+    gap: 2rem;
+    z-index: 50;
+
+    h1{
+        font-size: 1.5rem;                  
+    }
+
+    span{
+        font-size: 1.5rem;
+    }
+
+    .door-svg, .status-svg, .turn-svg, .time-svg, .audio-svg{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        gap: 5px;
+    }
+
+    .punts{
+        width: 80px;
+        text-align: center;
+    }
+
+    .audio-svg{
+        width: 40px;
+        cursor: pointer;
+    }
+
+
+}
