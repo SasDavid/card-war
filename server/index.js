@@ -42,9 +42,7 @@ const server = http.createServer(app);
  })
 
 
- app.get("/", (req, res)=>{
-   res.send("Hello world")
- })
+
 
 
 app.get("/resourcesImg/:value", async (req, res)=>{
