@@ -1,8 +1,0 @@
-node_modules
-
-client/dist
-client/node_modules
-client/public
-client/src
-client/.gitignore
-client/eslint.config.js
