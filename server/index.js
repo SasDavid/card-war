@@ -15,7 +15,7 @@ const app = express();
 
 export let ruta;
 
-const getOrigin = "produccion";
+const getOrigin = "local";
 
 if(getOrigin == "local") {
    ruta = 'http://localhost:5173';
@@ -68,7 +68,7 @@ io.on("connection", socket =>{
       const { user } = cookie.parse(socket.handshake.headers.cookie || "")
 
       if(user == undefined) {
-         socket.emit("redirect", "login")
+         socket.emit("redirect", "/login")
          return
       }
 

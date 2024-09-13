@@ -1,10 +1,13 @@
 import '../styles/sesion.css'
 import { useEffect, useContext } from 'react';
 import { MyContext } from './variablesGlobal';
+import { useNavigate } from 'react-router-dom'
 
 function Sesion () {
 
     const { socket, url } = useContext(MyContext)
+
+    const navigate = useNavigate();
 
 
     const logear = e =>{
@@ -22,7 +25,7 @@ function Sesion () {
             body: JSON.stringify({ username, password })
         })
         .then(res => res.text())
-        .then(res => window.location = res)
+        .then(res => navigate("/"))
         
 
 

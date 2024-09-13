@@ -12,7 +12,7 @@ function App() {
   const [nameRoom, setNameRoom] = useState("");
   const navigate = useNavigate();
   const [imgLoad, setImgLoad] = useState(0);
-  const [loadingImg, setLoadingImg] = useState(true)
+  const [loadingImg, setLoadingImg] = useState()
   const [serverList, setServerList] = useState([]);
   const [percent, setPercent] = useState(0);
 
@@ -61,13 +61,23 @@ function App() {
 
   }
 
+  useEffect(()=>{
+
+    if(loadingImg) {
+      document.getElementById("contenedorLoad").showModal();
+    } 
+
+  }, [loadingImg])
+
   useEffect(() => {
 
     if(imgBlob.length == 10 && imgBlob.every(element => element != undefined)){
+
+      if(loadingImg == false) return;
   
       setTimeout(()=>{
         setLoadingImg(false)
-        document.getElementById("contenedorLoad").close();
+        //document.getElementById("contenedorLoad").close();
 
         const a = document.createElement("IMG");
         document.body.appendChild(a)
@@ -78,32 +88,15 @@ function App() {
 
       }, 500)
     } else {
-      document.getElementById("contenedorLoad").showModal();
+      //document.getElementById("contenedorLoad").showModal();
       setLoadingImg(true)
     }
-
-    //console.log(loadingImg)
-
   }, [imgBlob]);
 
-  const teclado = (e)=>{
-
-    if(e.key == "o"){
-      document.getElementById("contenedorLoad").showModal();
-    }
-
-    if(e.key == "p"){
-      document.getElementById("contenedorLoad").close();
-    }
-
-
-    if(e.key == "l"){
-      requestImage();
-    }
-  }
 
   useEffect(()=>{
 
+    if(imgBlob.length == 10) return
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -111,7 +104,6 @@ function App() {
     let arrayBlob = [];
 
     const fetchPromises = [];
-
 
     for (let i = 0; i <= 9; i++) {
       if(imgBlob[i] == undefined) {
@@ -153,7 +145,14 @@ function App() {
       setImgBlob(arrayBlob);
     });
 
-   // setImgBlob(arrayBlob);
+    return ()=> {
+      controller.abort()
+    }
+
+  }, [])
+
+
+  useEffect(()=>{
 
     socket.on("updateServerList", data =>{
       setServerList(data)
@@ -168,14 +167,11 @@ function App() {
       console.log(message);
     })
 
-    document.addEventListener("keypress", teclado)
   
     return ()=>{
       socket.off("enterServer");
       socket.off("existServer");
       socket.off("updateServerList")
-      document.removeEventListener("keypress", teclado)
-      controller.abort()
     }
 
     

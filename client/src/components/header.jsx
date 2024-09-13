@@ -42,7 +42,7 @@ function Header (){
         
         socket.on("redirect",  data =>{
             
-            navigate(`/login`);
+            navigate(data);
         })
 
         socket.on("resetPunts", ()=>{
@@ -56,10 +56,11 @@ function Header (){
         })
 
         socket.on("upPunts", ({ cardOne, cardTwo })=>{
+            const cardTable = document.querySelectorAll(".card-table__img");
 
             const cards = [cardOne, cardTwo]
-            cards.forEach(element => {
-                element.classList.add("winner")
+            cards.forEach(card => {
+                cardTable[card].classList.add("winner")
             })
 
             setPuntsMe(a => a + 2);
@@ -72,9 +73,11 @@ function Header (){
         })
 
         socket.on("upPuntsHeShe", ({ cardOne, cardTwo })=>{
+            const cardTable = document.querySelectorAll(".card-table__img");
+           
             const cards = [cardOne, cardTwo]
-            cards.forEach(element => {
-                element.classList.add("defeated")
+            cards.forEach(card => {
+                cardTable[card].classList.add("defeated")
             })
 
             setPuntsHeShe(a => a + 2);
