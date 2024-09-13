@@ -15,7 +15,7 @@ const app = express();
 
 export let ruta;
 
-const getOrigin = "local";
+const getOrigin = "produccion";
 
 if(getOrigin == "local") {
    ruta = 'http://localhost:5173';
