@@ -1,12 +1,12 @@
 import React, { createContext, useState, useEffect } from 'react';
 import io from "socket.io-client"
 
-let ruta, produccion = true;
+let url, produccion = false;
  
-produccion ? ruta = window.location.protocol + "//" + window.location.hostname
-           : ruta = window.location.protocol + "//" + window.location.hostname + ":3000"
+produccion ? url = window.location.protocol + "//" + window.location.hostname
+           : url = window.location.protocol + "//" + window.location.hostname + ":3000"
 
-const socket = io(ruta, {
+const socket = io(url, {
   withCredentials: true,
   auth: {
       nombre: "David"
@@ -55,7 +55,7 @@ export function MyProvider({ children }) {
     room, setRoom,
     status,
     time,
-    ruta,
+    url,
     imgBlob, setImgBlob
   };
 

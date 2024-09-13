@@ -4,61 +4,53 @@ import { MyContext } from "./variablesGlobal";
 
 const Fight = ()=>{
 
-    //const [playAgain, setPlayAgain] = useState(false)
-
     const [infoServer, setInfoServer] = useState("...")
 
     const { socket, room, imgBlob } = useContext(MyContext)
 
+    const cardArray = Array(20).fill(null)
+    
+
     function resetCard () {
+
         const cardTable = document.querySelectorAll(".card-table__img");
         cardTable.forEach(element => {
-            
             element.classList.remove("winner", "defeated")
             element.setAttribute("src", "../cards.png")
-            
         })
     }
 
     useEffect(()=>{
-
-        const cardTable = document.querySelectorAll(".card-table__img");
-        for (let i = 0; i < cardTable.length; i++) {
-            cardTable[i].order = i;
-        }
 
         socket.on("resetCard", ()=>{
             resetCard();
         })
 
         socket.on("cardSelected", ({card, type}) => {
-           // console.log("La carta seleccionada es:", card, type)
-            //cardTable[card].setAttribute("src", "../card-types/" + type + ".png");
+            const cardTable = document.querySelectorAll(".card-table__img");
             cardTable[card].setAttribute("src", imgBlob[type]);
-            
         })
 
-        socket.on("spinCard", data=>{
-            cardTable[data.cardOne].setAttribute("src", "../cards.png")
-            cardTable[data.cardTwo].setAttribute("src", "../cards.png")
+        socket.on("spinCard", ({ cardOne, cardTwo }) => {
+          const cards = [cardOne, cardTwo];
 
-            cardTable[data.cardOne].style.animation = "turnCard .2s ease-out";
-            cardTable[data.cardTwo].style.animation = "turnCard .2s ease-out";
+          const cardTable = document.querySelectorAll(".card-table__img");
 
-            setTimeout(() => {
+          cards.forEach(card => {
+            cardTable[card].setAttribute("src", "../cards.png");
+            cardTable[card].style.animation = "turnCard .2s ease-out";
+          });
 
-                cardTable[data.cardOne].style.animation = "";
-                cardTable[data.cardTwo].style.animation = "";
-                
-            }, 500);
+          setTimeout(() => {
+            cards.forEach(card => {
+              cardTable[card].style.animation = "";
+            });
+          }, 500);
         });
 
         socket.on("infoServer", info=>{
             setInfoServer(info)
         })
-
- 
-
 
         return ()=>{
             socket.off("cardSelected");
@@ -77,9 +69,7 @@ const Fight = ()=>{
     }
 
     const newGame = ()=>{
-
         const tipo = document.getElementById("dialog_newGame").removeAttribute("open")
- 
     }
 
     return (
@@ -98,28 +88,15 @@ const Fight = ()=>{
             </section>
             
             <section id="card-table">
-
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-                <img className="card-table__img" onClick={(e) => handleCard(e.target.order)} src="/cards.png" alt="" />
-
+                {cardArray.map((_, index)=>(
+                    <img
+                      key={index}
+                      className="card-table__img"
+                      onClick={() => handleCard(index)}
+                      src="/cards.png"
+                      alt=""
+                    />
+                ))}
             </section>
         </>
     )

@@ -16,7 +16,7 @@ function App() {
   const [serverList, setServerList] = useState([]);
   const [percent, setPercent] = useState(0);
 
-  const { socket, setRoom, ruta, imgBlob, setImgBlob } = useContext(MyContext)
+  const { socket, setRoom, url, imgBlob, setImgBlob } = useContext(MyContext)
 
 
   const joinServer = ()=>{
@@ -37,7 +37,7 @@ function App() {
     setImgLoad(prev => prev + 1);
 
     // Fetch que se ejecuta solo una vez
-    fetch(ruta + '/resourcesImg/' + num, { signal })
+    fetch(url + '/resourcesImg/' + num, { signal })
     .then(response => response.blob())
     .then(data => {
       const newElement = document.createElement("img");
@@ -119,7 +119,7 @@ function App() {
           setImgLoad(prev => prev + 1);
 
           // Fetch que se ejecuta solo una vez
-          const fetchPromise = fetch(ruta + '/resourcesImg/' + i, { signal })
+          const fetchPromise = fetch(url + '/resourcesImg/' + i, { signal })
           .then(response => response.blob())
           .then(data => {
             const newElement = document.createElement("img");
@@ -181,12 +181,12 @@ function App() {
     
   },[])
 
-  
+
+
 
   return (
     <>
 
-    
 
 
     <h1 className='text-lobby'>Servidor...</h1>
@@ -216,17 +216,14 @@ function App() {
     </main>
 
 
-    {loadingImg 
-      ? (
+
+    {loadingImg && (
         <dialog id="contenedorLoad">
           <h3>Cargando...</h3>
           <div className="loadResources">
             <div style={{width: percent + "%"}} className="loadCurrent"></div>
           </div>
         </dialog>
-      )
-      : (
-        <span>Beta</span>
       )
     }
 

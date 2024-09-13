@@ -18,7 +18,7 @@ function Header (){
     const [turn, setTurn] = useState("???");
     const [puntsMe, setPuntsMe] = useState(0);
     const [puntsHeShe, setPuntsHeShe] = useState(0);
-    const { socket, room, status, time, URL } = useContext(MyContext);
+    const { socket, room, status, time, url } = useContext(MyContext);
 
     const [audio, setAudio] = useState(false)
     const navigate = useNavigate();
@@ -56,27 +56,45 @@ function Header (){
         })
 
         socket.on("upPunts", ({ cardOne, cardTwo })=>{
+
+            const cards = [cardOne, cardTwo]
+            cards.forEach(element => {
+                element.classList.add("winner")
+            })
+
             setPuntsMe(a => a + 2);
-            const cardTable = document.querySelectorAll(".card-table__img");
-            
-            cardTable[cardOne].classList.add("winner")
-            cardTable[cardTwo].classList.add("winner")
+
+            //const cardTable = document.querySelectorAll(".card-table__img");
+            //cardTable[cardOne].classList.add("winner")
+            //cardTable[cardTwo].classList.add("winner")
 
             document.getElementById("audio-fight").setAttribute("src", "/sounds/well.mp3")
         })
 
         socket.on("upPuntsHeShe", ({ cardOne, cardTwo })=>{
-            setPuntsHeShe(a => a + 2);
-            const cardTable = document.querySelectorAll(".card-table__img");
+            const cards = [cardOne, cardTwo]
+            cards.forEach(element => {
+                element.classList.add("defeated")
+            })
 
-            cardTable[cardOne].classList.add("defeated")
-            cardTable[cardTwo].classList.add("defeated")
+            setPuntsHeShe(a => a + 2);
+            
+            //const cardTable = document.querySelectorAll(".card-table__img");
+            //cardTable[cardOne].classList.add("defeated")
+            //cardTable[cardTwo].classList.add("defeated")
 
             document.getElementById("audio-fight").setAttribute("src", "/sounds/attacked.mp3")
         })
 
-        
-        
+        function eventKeyPress(e) {
+            if(e.key == "b"){
+                fetch(url + "/resetTime")
+                .then(res => res.text())
+                .then(res => console.log(res))
+            }
+        }
+
+        document.addEventListener("keypress", eventKeyPress)
 
         return ()=>{
             socket.off("turn")
@@ -84,6 +102,7 @@ function Header (){
             socket.off("upPuntsHeShe")
             socket.off("resetPunts");
             socket.off("redirect")
+            document.removeEventListener("keypress", eventKeyPress)
         }
 
         

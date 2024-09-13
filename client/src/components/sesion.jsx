@@ -4,7 +4,7 @@ import { MyContext } from './variablesGlobal';
 
 function Sesion () {
 
-    const { socket, URL } = useContext(MyContext)
+    const { socket, url } = useContext(MyContext)
 
 
     const logear = e =>{
@@ -15,7 +15,7 @@ function Sesion () {
 
 
         
-        fetch(URL + "/logear", {
+        fetch(url + "/logear", {
             method: "POST",
             credentials: "include",
             headers: {"Content-Type" : "application/json"},
