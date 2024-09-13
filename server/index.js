@@ -21,11 +21,12 @@ if(getOrigin == "local") {
    ruta = 'http://localhost:5173';
 
 } else if(getOrigin == "prueba"){
-   ruta = path.resolve("client", "dist");
-   app.use(express.static(ruta));
+   ruta = 'http://localhost:5173';
+   app.use(express.static(path.resolve("client", "dist")));
 
 } else if(getOrigin == "produccion"){
-   ruta = process.env.ORIGIN;
+   ruta = path.resolve("client", "dist");
+   app.use(express.static(ruta));
 }
 
 app.use(express.json())
