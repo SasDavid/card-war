@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import io from "socket.io-client"
 
-let url, produccion = false;
+let url, produccion = true;
  
 produccion ? url = window.location.protocol + "//" + window.location.hostname
            : url = window.location.protocol + "//" + window.location.hostname + ":3000"
