@@ -51,7 +51,7 @@ class CardTable {
         table.relojStatus = "off"
         this.cronometro({ table, allSockets });
 
-        table.identification = [];
+        //table.identification = [];
 
         table.ready[0] = false
         table.ready[1] = false
@@ -199,9 +199,16 @@ class CardTable {
         console.log("Alguien se ha desconectado con la id: ", socket.id)
 
         const roomIndex = listTable.findIndex(element => {
-            if(element.sockets.length > 0){
-                return element.sockets.some(item => item.id == socket.id) 
+            if(element.sockets.some(item => item.id == socket.id)) {
+
+                if(element.identification.length > 0){
+                    return element.identification.some(identity => {
+                        return identity == user
+                    }) 
+                }
+
             }
+
         })
             
         // No pertenece a ninguna room
@@ -315,7 +322,7 @@ class CardTable {
 
         //Ahora estoy listo
         existServer.identification.push(user)
-        //existServer.sockets.push(socket);
+        existServer.sockets.push(socket);
         socket.join(title)
 
         if(existServer.identification.length == 2){
@@ -367,7 +374,7 @@ class CardTable {
         const room = listTable.find(element => element.title == title);
         if(room){
             socket.join(title)
-            room.sockets.push(socket)
+            //room.sockets.push(socket)
             console.log("Unido a la room " + title)
         }
 
