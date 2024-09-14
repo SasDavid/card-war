@@ -40,6 +40,8 @@ function App() {
       socket.emit("joinRoom", { title: res.goRoom })
       setRoom(res.goRoom)
       navigate(`/rooms/${res.goRoom}`);
+      socket.disconnect();
+      socket.connect();
     } else {
       console.log(res.message)
     }
@@ -71,6 +73,8 @@ function App() {
       socket.emit("joinRoom", { title: res.goRoom })
       setRoom(res.goRoom)
       navigate(`/rooms/${res.goRoom}`);
+      socket.disconnect();
+      socket.connect();
     }
 
     } catch (err) {
