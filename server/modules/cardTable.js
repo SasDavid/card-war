@@ -147,6 +147,13 @@ class CardTable {
                     // EMPATE
                     if(table.punts[0] == 10 && table.punts[1] == 10){
                         allSockets.to(table.title).emit("turn", "Draw");
+
+                        table.ready[0] = false
+                        table.ready[1] = false
+                        table.playing = false
+
+                        table.identification = [];
+                        return;
                     } 
 
                     // Otra tirada de cartas
