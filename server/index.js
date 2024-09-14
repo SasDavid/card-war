@@ -42,7 +42,7 @@ app.use(cors({
 
 
 const server = http.createServer(app);
-const io = new SocketServer(server, {
+export const io = new SocketServer(server, {
    cors: {
       origin: ruta,
       credentials: true
@@ -55,6 +55,8 @@ app.use('/', mainRouter)
 
 io.on("connection", socket =>{
 
+   console.log("anyone has connected")
+
    socket.join("lobby")
 
    socket.emit("updateServerList", serverListLoad)
@@ -63,77 +65,27 @@ io.on("connection", socket =>{
       socket.broadcast.emit("handleMessage", data)
    })
 
-   socket.on("joinServer", data=>{
-
-      const { user } = cookie.parse(socket.handshake.headers.cookie || "")
-
-      if(user == undefined) {
-         socket.emit("redirect", "/login")
-         return
-      }
-
-      const notExistServer = CardTable.join({ socket, room: data, user })
-
-      if(notExistServer) {
-         console.log("No existe el servidor")
-      } else {
-         socket.leave("lobby");
-
-         console.log(serverListLoad)
-         io.to("lobby").emit("updateServerList", serverListLoad)
-         socket.emit("enterServer", data)
-      }
-
-   })
-
    socket.on("cardSelected", ({card, room}) =>{
       CardTable.click({ card, roomTitle: room, socket, allSockets: io});
-      
-   })
-
-   socket.on("createServer", data =>{
-
-      const { user } = cookie.parse(socket.handshake.headers.cookie || "");
-
-      if(user == undefined) {
-         socket.emit("redirect", "login")
-         return
-      }
-
-      const existServer = CardTable.create({socket, title: data, user});
-
-   
-      if(!existServer) {
-         socket.leave("lobby");
-
-         const ListLoad = listTable.map(element => {
-            const { title, joined, serverStatus, idServer } = element
-            return { room: title, joined, serverStatus, id: idServer }
-         })
-   
-         serverListLoad.push(...ListLoad)
-      
-         io.to("lobby").emit("updateServerList", serverListLoad)
-
-         socket.emit("enterServer", data)
-      } else {
-         socket.emit("existServer", existServer)
-      }
-      
    })
 
    socket.on('disconnect', () => {
-      CardTable.desconexion({ id : socket.id, allSockets: io})
+      const { user } = cookie.parse(socket.handshake.headers.cookie || "")
+      CardTable.desconexion({ user, socket, allSockets: io})
       io.to("lobby").emit("updateServerList", serverListLoad)
-
    });
 
    socket.on("imReady", ()=>{
-
       const { user } = cookie.parse(socket.handshake.headers.cookie || "")
-      CardTable.imReady({ user, allSockets: io })
+      const { room } = cookie.parse(socket.handshake.headers.cookie || "")
+      CardTable.imReady({ title: room, user, socket, allSockets: io })
       
    })
+
+   socket.on("joinRoom", ({ title })=>{
+      CardTable.joinRoom({ title, socket })
+   })
+
 
 })
 

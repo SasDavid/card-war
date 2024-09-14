@@ -25,7 +25,11 @@ function Sesion () {
             body: JSON.stringify({ username, password })
         })
         .then(res => res.text())
-        .then(res => navigate("/"))
+        .then(res => {
+            navigate("/")
+            socket.disconnect();
+            socket.connect();
+         })
         
 
 

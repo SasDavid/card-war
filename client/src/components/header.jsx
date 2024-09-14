@@ -91,7 +91,9 @@ function Header (){
 
         function eventKeyPress(e) {
             if(e.key == "b"){
-                fetch(url + "/resetTime")
+                fetch(url + "/resetTime", {
+                    credentials: "include"
+                })
                 .then(res => res.text())
                 .then(res => console.log(res))
             }

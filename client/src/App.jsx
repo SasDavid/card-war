@@ -19,12 +19,67 @@ function App() {
   const { socket, setRoom, url, imgBlob, setImgBlob } = useContext(MyContext)
 
 
-  const joinServer = ()=>{
-   socket.emit("joinServer", nameRoom);
+  const joinServer = async()=>{
+
+    try {
+
+    const request = await fetch(url + "/joinServer", {
+      method: "post",
+      credentials: "include",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({title: "kami"})
+    })
+
+    //!request.ok //... code USAR EL THROW NEW ERROR PARA ACTIVAR EL CATCH
+    
+    const res = await request.json();
+
+    if(res.message == "login") {
+      navigate("/login")
+    } else if(res.message == "exist") {
+      socket.emit("joinRoom", { title: res.goRoom })
+      setRoom(res.goRoom)
+      navigate(`/rooms/${res.goRoom}`);
+    } else {
+      console.log(res.message)
+    }
+
+    } catch (err) {
+      if(err.message == "login") navigate("/login")
+      console.log(err)
+    }
   }
 
-  const createServer = ()=>{
-    socket.emit("createServer", nameServer)
+  const createServer = async()=>{
+
+    try {
+
+    const request = await fetch(url + "/createServer", {
+      method: "post",
+      credentials: "include",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({title: "kami"})
+    })
+
+    //!request.ok //... code
+    
+    const res = await request.json();
+
+    if(res.message == "login") {
+      navigate("/login")
+    } else if(res.message == "room") {
+      socket.emit("joinRoom", { title: res.goRoom })
+      setRoom(res.goRoom)
+      navigate(`/rooms/${res.goRoom}`);
+    }
+
+    } catch (err) {
+      if(err.message == "login") navigate("/login")
+      console.log(err)
+    }
+
+
+   // socket.emit("createServer", nameServer)
   }
 
   const requestImage = num =>{
@@ -190,9 +245,9 @@ function App() {
     <main>
 
     <section id="section-server">
-      <input value={nameServer} onChange={(e)=> setNameServer(e.target.value)} type="text" placeholder='Name of the room' />
+      <input disabled value={nameServer} onChange={(e)=> setNameServer(e.target.value)} type="text" placeholder='Name of the room' />
       <button className='section-server__button' onClick={createServer}>Crear servidor</button>
-      <input value={nameRoom} onChange={(e) => setNameRoom(e.target.value)} type="text" placeholder='introduce la sala'/>
+      <input disabled value={nameRoom} onChange={(e) => setNameRoom(e.target.value)} type="text" placeholder='introduce la sala'/>
       <button className='section-server__button' onClick={joinServer}>Unirse al servidor</button>
     </section>
 
@@ -210,7 +265,6 @@ function App() {
     </section>
 
     </main>
-
 
 
     {loadingImg && (

@@ -2,23 +2,23 @@ export let listTable = [];
 
 export let serverListLoad = [];
 
-let indexServer = 0;
+export let indexServer = 0;
 
 
 class CardTable {
 
     constructor(){}
 
-    static create = ({ socket, title, user }) => {
+    static create = ({ title, user }) => {
 
        const ExistServer = listTable.find(element => element.title == title);
        if(ExistServer) return "El servidor ya existe";
 
-        socket.join(title)
+        //socket.join(title)
 
         const objeto = {
             title,
-            sockets : [socket],
+            sockets : [],
             cards: [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9].sort(()=> Math.random() - 0.5),
             selectedCards : 0,
             selectedCardNum : [null, null],
@@ -26,7 +26,7 @@ class CardTable {
             status : "processing",
             punts : [0, 0],
             turn : undefined,
-            identification: [user],
+            identification: [],
             time: 20,
             relojStatus: "off",
             timeOut: undefined,
@@ -35,7 +35,7 @@ class CardTable {
             cardPar: [],
             joined: "1 / 2",
             serverStatus: "Waiting...",
-            idServer: indexServer
+            idServer: indexServer,
         }
 
         listTable.push(objeto);
@@ -50,6 +50,8 @@ class CardTable {
         table.time = 20;
         table.relojStatus = "off"
         this.cronometro({ table, allSockets });
+
+        table.identification = [];
 
         table.ready[0] = false
         table.ready[1] = false
@@ -117,15 +119,6 @@ class CardTable {
                 //THE CARDS LOOK ALIKE
                 if(table.selectedCardNum[0] == table.selectedCardNum[1]){
 
-                    // Otra tirada de cartas
-                    if(table.punts[0] < 10 && table.punts[1] < 10) {
-                        table.status = "start";
-                        table.time = 20;
-                        allSockets.to(table.title).emit("resetTime", table.time);
-                        table.relojStatus = "on"
-                        this.cronometro({ table, allSockets });
-                    }
-
                     // Elevar punto al socket
                     socket.emit("upPunts", {cardOne: table.cardNum[0], cardTwo: table.cardNum[1]});
 
@@ -145,12 +138,27 @@ class CardTable {
                         table.ready[0] = false
                         table.ready[1] = false
                         table.playing = false
+
+                        table.identification = [];
+                        table.sockets = [] 
+                        return;
                     }
 
                     // EMPATE
                     if(table.punts[0] == 10 && table.punts[1] == 10){
                         allSockets.to(table.title).emit("turn", "Draw");
                     } 
+
+                    // Otra tirada de cartas
+                    if(table.punts[0] < 12 && table.punts[1] < 12) {
+                        table.status = "start";
+                        table.time = 20;
+                        allSockets.to(table.title).emit("resetTime", table.time);
+                        table.relojStatus = "on"
+                        this.cronometro({ table, allSockets });
+                    }
+
+
                     
                     table.cardPar.push(table.cardNum[0], table.cardNum[1]);
 
@@ -175,18 +183,30 @@ class CardTable {
         }
     }
 
-    static desconexion = ({ id, allSockets }) => {
+    static desconexion = ({ user, socket, allSockets }) => {
 
-        console.log("Alguien se ha desconectado con la id: ", id)
+        //return;
 
-        const roomIndex = listTable.findIndex(element => 
-            element.sockets[0].id == id || element.sockets[1].id == id);
+        //Solo tendra validez si anda dentro de una room
+
+        console.log("Alguien se ha desconectado con la id: ", socket.id)
+
+        const roomIndex = listTable.findIndex(element => {
+            if(element.sockets.length > 0){
+                return element.sockets.some(item => item.id == socket.id) 
+            }
+        })
             
         // No pertenece a ninguna room
-        if(roomIndex == -1) return
+        if(roomIndex == -1) {
+            console.log("No pertenezco a ninguna sala")
+            return;
+        }
+
+        console.log("Me desconecte y pertenecia a la room " + listTable[roomIndex].title)
 
         const table = listTable[roomIndex];
-        const index = table.sockets[0].id == id ? 0 : 1;
+        const index = table.sockets[0].id == socket.id ? 0 : 1;
 
         // Si se salió el 0 y el 1 no está, deten la ejecución
         //Eliminar room
@@ -195,23 +215,28 @@ class CardTable {
             listTable = listTable.filter(element => element.title != table.title)
             serverListLoad = serverListLoad.filter(element => element.room != table.title)
             indexServer--;
+            console.log("borra server")
             return;
 
         }
             
-        table.sockets[index == 0 ? 1 : 0].emit("infoServer", "¡Tu oponente ha abandonado la sala!")
-        serverListLoad[table.idServer].joined = "1 / 2";
+        table.sockets[index == 0 ? 1 : 0].emit("infoServer", "Ready?")
+        serverListLoad[table.idServer].joined = "1";
         serverListLoad[table.idServer].serverStatus = "Waiting...";
         
 
-        // Intercambiar de la posicion 1 a la 0 si es el 0 el que se salió
+        // Si se salió el 0 y el 1 si está, cambiar la posición del 1 para el 0
         if(index == 0){
             table.sockets[0] = table.sockets[1];
             table.identification[0] = table.identification[1]
         }
 
-        table.sockets[1] = null;
-        table.identification[1] = null;
+        // Quitar la posicion 1 independientemente de quien se salió
+        //table.sockets[1] = null;
+        //table.identification[1] = null;
+
+        table.sockets.pop();
+        table.identification.pop();
 
         this.resetHeader({ table })
 
@@ -266,48 +291,71 @@ class CardTable {
         
     }
 
-    static imReady = ({ user, allSockets })=>{
+    static imReady = ({ title, user, socket, allSockets })=>{
 
-        const roomIndex = listTable.findIndex(element =>
-            element.identification[0] == user || element.identification[1] == user
-        )
-        const table = listTable[roomIndex];
+        const existServer = listTable.find(element => element.title == title);
+
+        //Ya estaba listo
+        //const notReady = existServer.identification.every(element => element != user)
+        const notReady = true
+        if(!notReady) return;
+
+        //Ahora estoy listo
+        existServer.identification.push(user)
+        //existServer.sockets.push(socket);
+        socket.join(title)
+
+        if(existServer.identification.length == 2){
+            allSockets.to(title).emit("infoServer", "Get ready for fight")
+            allSockets.to("kami").emit("sound-info", "/sounds/start.mp3")
+            this.resetHeader({ table: existServer, allSockets })
+            existServer.playing = true
+            setTimeout(()=>{
+                allSockets.to(title).emit("infoServer", "¡Fight!")
+                allSockets.to(title).emit("sound-info", "/sounds/start-2.mp3")
+                this.assignTurn({ table: existServer, allSockets });
+            }, 12000)
+        } else {
+            socket.emit("infoServer", "Waiting for opponent")
+            socket.emit("sound-info", "/sounds/ready.mp3")
+        }
+
+        return;
 
         if(table.playing) return;
 
-        const index = table.ready[0] == false ? 0 : 1;
-        table.ready[index] = true
-        if(table.ready[index == 0 ? 1 : 0] == false) {
-            table.sockets[index].emit("infoServer", "Waiting opponent...")
-            table.sockets[index].emit("sound-info", "/sounds/ready.mp3")
-        } else {
-            allSockets.to(table.title).emit("infoServer", "Get ready for fight")
-            allSockets.to(table.title).emit("sound-info", "/sounds/start.mp3")
-            this.resetHeader({ table, allSockets })
-            table.playing = true
-            setTimeout(()=>{
-                allSockets.to(table.title).emit("infoServer", "¡Fight!")
-                allSockets.to(table.title).emit("sound-info", "/sounds/start-2.mp3")
-                this.assignTurn({ table, allSockets });
-            }, 12000)
-        }
+        
 
     }
 
-    static join = ({ socket, room, user }) => {
+    static join = ({ title, user }) => {
 
-       const ExistServer = listTable.find(element => element.title == room);
-       if(!ExistServer) return "No hay servidor para jugar"
+        const existServer = listTable.find(element => element.title == title);
+        if(!existServer) return
+
+        //ExistServer.identification.push(user)
 
         for (let i = 0; i < listTable.length; i++) {
-            if(listTable[i].title.includes(room)){
-                socket.join(room);
-                const index = listTable[i].sockets[0] == null ? 0 : 1;
-                listTable[i].sockets[index] = socket;
-                listTable[i].identification[index] = user;
-                serverListLoad[listTable[i].idServer].joined = "2 / 2";
-                serverListLoad[listTable[i].idServer].serverStatus = "Fight";
+            if(listTable[i].title.includes(title)){
+                //socket.join(room);
+                //const index = listTable[i].sockets[0] == null ? 0 : 1;
+                //listTable[i].sockets[index] = socket;
+                //listTable[i].identification[index] = user;
+
+                //El index es el id
+                //serverListLoad[listTable[i].idServer].joined = "2 / 2";
+                //serverListLoad[listTable[i].idServer].serverStatus = "Fight";
             }
+        }
+    }
+
+    static joinRoom = ({ title, socket })=>{
+
+        const room = listTable.find(element => element.title == title);
+        if(room){
+            socket.join(title)
+            room.sockets.push(socket)
+            console.log("Unido a la room " + title)
         }
 
     }
