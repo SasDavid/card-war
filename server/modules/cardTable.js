@@ -140,7 +140,7 @@ class CardTable {
                         table.playing = false
 
                         table.identification = [];
-                        table.sockets = [] 
+                        //table.sockets = [] 
                         return;
                     }
 
@@ -303,6 +303,8 @@ class CardTable {
             if(!notReady) return;
 
         }
+
+        if(existServer.playing) return;
 
         //Ahora estoy listo
         existServer.identification.push(user)
