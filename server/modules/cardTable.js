@@ -295,7 +295,7 @@ class CardTable {
 
         const existServer = listTable.find(element => element.title == title);
 
-        if(existServer.identification.length > 0) {
+        if(existServer.identification != undefined) {
 
             //Ya estaba listo
             const notReady = existServer.identification.every(element => element != user)
