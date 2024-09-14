@@ -114,7 +114,12 @@ mainRouter.post("/joinServer", (req, res)=>{
       if(notExistServer) {
          res.json({ message: "No existe el servidor "})
       } else {
-         res.json({ message: "exist", goRoom: title})
+         res.cookie("room", title, {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 3 //3 hour
+         }).json({message: "exist", goRoom: title});
+
+
          //socket.leave("lobby");
 
          //console.log(serverListLoad)
