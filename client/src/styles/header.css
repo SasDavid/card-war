@@ -3,7 +3,6 @@
     position: fixed;
     top: 0;
     width: 100%;
-    min-width: 300px;
     background-color: #0000002a;
     justify-content: space-around;
     align-items: center;
@@ -29,8 +28,9 @@
     }
 
     .punts{
-/*        width: 80px;*/
-/*        text-align: center;*/
+        font-size: 1.5rem;
+        width: 75px;
+        text-align: center;
     }
 
     .audio-svg{
@@ -40,40 +40,6 @@
 
     svg {
         height: 40px;
-    }
-
-
-}
-
-@media screen and (max-width: 700px){
-
-    #header {
-
-        span{
-            font-size: 1.2rem;
-        }
-
-
-        padding: 0;
-        gap: 0;
-
-        .door-svg, .status-svg, .turn-svg, .time-svg, .audio-svg{
-            display: flex;
-/*            align-items: center;*/
-/*            justify-content: center;*/
-/*            width: 70px;*/
-/*            gap: 5px;*/
-
-            svg {
-                height: 25px;
-            }
-        }
-
-        .audio-svg{
-            width: 30px;
-            cursor: pointer;
-        }
-
     }
 
 

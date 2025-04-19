@@ -1,4 +1,5 @@
 import "../styles/header.css"
+import "../styles/headerMobile.css"
 
 import React, { useContext, useEffect, useState } from "react"
 

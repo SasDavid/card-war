@@ -45,7 +45,7 @@ body{
     background-color: #3333336e;
     border-radius: 10px;
     border: 1px solid #fff;
-    min-width: 300px;
+    min-width: 200px;
     max-width: 800px;
     width: 80%;
     padding: 20px;
@@ -60,7 +60,7 @@ body{
 #card-table .card-table__img{
 
     outline: 2px solid #000000;
-    height: auto;
+/*    height: auto;*/
     width: 120px;
     rotate: 0;
     scale: 1;
@@ -215,14 +215,16 @@ body{
         
         max-width: 800px;
         width: 100%;
+        gap: 5px;
+        padding: 10px;
         
     }
 
     #card-table .card-table__img{
 
         outline: 2px solid #000000;
-        height: auto;
-        width: 100px;
+/*        height: auto;*/
+        width: 75px;
         rotate: 0;
         scale: 1;
 
