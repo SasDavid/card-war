@@ -127,24 +127,24 @@ function Header (){
             <header id="header">
                
                 <div className="door-svg">
-                    <DoorSVG fill="#fff" height={50} />
+                    <DoorSVG fill="#fff" />
                     <span>{room}</span>
                 </div>
 
                 <div className="status-svg">
-                    <StatusSVG fill="#fff" height={40} />
+                    <StatusSVG fill="#fff" />
                     <span>{status}</span>
                 </div>
 
                 <div className="turn-svg">
-                    <TurnSVG fill="#fff" height={40} />
+                    <TurnSVG fill="#fff" />
                     <span>{turn}</span>
                 </div>
 
                 <span className="punts">{puntsMe} / {puntsHeShe}</span>
 
                 <div className="time-svg">
-                    <TimeSVG fill="#fff" width={40} />
+                    <TimeSVG fill="#fff" />
                     <span>{time}s</span>
                 </div>
                 <div className="audio-svg">

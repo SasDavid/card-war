@@ -1,16 +1,15 @@
 import React, { createContext, useState, useEffect } from 'react';
 import io from "socket.io-client"
 
-let url, produccion = true;
+let url, produccion = false;
  
 produccion ? url = window.location.protocol + "//" + window.location.hostname
-           : url = window.location.protocol + "//" + window.location.hostname + ":3000"
+           : url = "http://localhost" + ":3000"
+
+console.log(url)
 
 const socket = io(url, {
-  withCredentials: true,
-  auth: {
-      nombre: "David"
-  }
+  withCredentials: true
 });
 
 

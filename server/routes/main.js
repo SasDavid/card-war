@@ -30,20 +30,24 @@ mainRouter.get("/resetTime", (req, res)=>{
    res.send(":)")
 })
 
+mainRouter.get("/bueno", (req, res)=>{
+   res.send("Bueno")
+})
 
 mainRouter.post("/logear", (req, res)=>{
 
    const { username, password } = req.body;
 
-   const token = jwt.sign({ username, password }, process.env.SECRET_JWT_KEY, {
-      expiresIn: "3h"
-   });
-   
+   const token = jwt.sign({ username, password }, process.env.SECRET_JWT_KEY);
 
-   res.cookie("user", token, {
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 3 //3 hour
-   }).send(ruta)
+   setTimeout(()=>{
+
+      res.cookie("user", token, {
+         httpOnly: true
+      }).send("/")
+
+   }, 500)
+
 
 })
 
@@ -53,7 +57,6 @@ mainRouter.post("/createServer", (req, res) =>{
       const { user } = req.cookies;
       const { title } = req.body;
 
-      //console.log(title)
 
       if(user == undefined) {
          res.json({message: "login"})
@@ -64,21 +67,6 @@ mainRouter.post("/createServer", (req, res) =>{
 
    
       if(!existServer) {
-         //socket.leave("lobby");
-
-         /*
-
-         const ListLoad = listTable.map(element => {
-            const { title, joined, serverStatus, idServer } = element
-            return { room: title, joined, serverStatus, id: idServer }
-         })
-   
-         serverListLoad.push(...ListLoad)
-      
-         io.to("lobby").emit("updateServerList", serverListLoad)
-         */
-
-       //  console.log(data)
 
          serverListLoad.push(
             { id: indexServer, room: title, joined: "1", serverStatus: "Waiting"}
@@ -87,8 +75,7 @@ mainRouter.post("/createServer", (req, res) =>{
          io.to("lobby").emit("updateServerList", serverListLoad)
 
          res.cookie("room", title, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 3 //3 hour
+            httpOnly: true
          }).json({message: "room", goRoom: title});
 
       } else {
@@ -105,19 +92,31 @@ mainRouter.post("/joinServer", (req, res)=>{
       const { title } = req.body;
 
       if(user == undefined) {
-         res.json({ message: "login "})
+         res.json({ message: "login"})
          return
       }
+
+      console.log("el titulo es " + title)
 
       const notExistServer = CardTable.join({ title, user })
 
       if(notExistServer) {
          res.json({ message: "No existe el servidor "})
       } else {
+
+
          res.cookie("room", title, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 3 //3 hour
+            httpOnly: true
          }).json({message: "exist", goRoom: title});
+
+         const roomIndex = serverListLoad.findIndex(element => element.room == title)
+         // console.log(serverListLoad)
+         // console.log(roomIndex)
+         serverListLoad[roomIndex].joined = "2"
+         serverListLoad[roomIndex].serverStatus = "Full"
+
+
+         io.to("lobby").emit("updateServerList", serverListLoad)
 
 
          //socket.leave("lobby");

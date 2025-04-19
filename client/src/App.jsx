@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import "./index.css"
 import './App.css'
+import "./styles/normalize.css"
 
 import { useNavigate } from "react-router-dom"
 import { MyContext } from './components/variablesGlobal'
@@ -27,14 +28,17 @@ function App() {
       method: "post",
       credentials: "include",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({title: "kami"})
+      body: JSON.stringify({title: nameRoom})
     })
 
     //!request.ok //... code USAR EL THROW NEW ERROR PARA ACTIVAR EL CATCH
     
     const res = await request.json();
 
+    console.log(res)
+
     if(res.message == "login") {
+      console.log("Es igual a login")
       navigate("/login")
     } else if(res.message == "exist") {
       socket.emit("joinRoom", { title: res.goRoom })
@@ -43,6 +47,7 @@ function App() {
       socket.disconnect();
       socket.connect();
     } else {
+      console.log("No es igual a login ni exist")
       console.log(res.message)
     }
 
@@ -60,7 +65,7 @@ function App() {
       method: "post",
       credentials: "include",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({title: "kami"})
+      body: JSON.stringify({title: nameServer})
     })
 
     //!request.ok //... code
@@ -242,16 +247,14 @@ function App() {
   return (
     <>
 
-
-
     <h1 className='text-lobby'>Servidor...</h1>
 
     <main>
 
     <section id="section-server">
-      <input disabled value={nameServer} onChange={(e)=> setNameServer(e.target.value)} type="text" placeholder='Name of the room' />
+      <input value={nameServer} onChange={(e)=> setNameServer(e.target.value)} type="text" placeholder='Name of the room' />
       <button className='section-server__button' onClick={createServer}>Crear servidor</button>
-      <input disabled value={nameRoom} onChange={(e) => setNameRoom(e.target.value)} type="text" placeholder='introduce la sala'/>
+      <input value={nameRoom} onChange={(e) => setNameRoom(e.target.value)} type="text" placeholder='introduce la sala'/>
       <button className='section-server__button' onClick={joinServer}>Unirse al servidor</button>
     </section>
 

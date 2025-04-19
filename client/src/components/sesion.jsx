@@ -1,9 +1,15 @@
 import '../styles/sesion.css'
-import { useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { MyContext } from './variablesGlobal';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { useLogin } from '../hooks/useLogin'
 
 function Sesion () {
+
+    const [userName, setUserName] = useState("")
+    const [password, setPassword] = useState("")
+
+    const { login, isLoading } = useLogin();
 
     const { socket, url } = useContext(MyContext)
 
@@ -13,29 +19,8 @@ function Sesion () {
     const logear = e =>{
         e.preventDefault();
 
-        const username = document.querySelector(".input_name").value;
-        const password = document.querySelector(".input_password").value;
+        login({ userName, password })
 
-
-        
-        fetch(url + "/logear", {
-            method: "POST",
-            credentials: "include",
-            headers: {"Content-Type" : "application/json"},
-            body: JSON.stringify({ username, password })
-        })
-        .then(res => res.text())
-        .then(res => {
-            navigate("/")
-            socket.disconnect();
-            socket.connect();
-         })
-        
-
-
-
-
-        //socket.emit("logear", {username, password});
     }
 
     useEffect(()=>{
@@ -55,12 +40,18 @@ function Sesion () {
         <dialog open id="Sesion_Modal">
             <form onSubmit={logear}>
 
-                <header>
-                    Iniciar Sesion
-                </header>
+                {/*<header>Iniciar Sesion</header>*/}
 
-                <input className='input_name' placeholder='Name of user' type="text" />
-                <input className="input_password" placeholder='Password' type="password" />
+                {isLoading 
+                ? <p style={{"margin": "0"}}>Cargando...</p>
+                : <header>Iniciar Sesion</header>
+                }
+
+                {/*<p style={{"margin": "0"}}>Cargando...</p>*/}
+
+
+                <input onChange={(e => setUserName(e.target.value))} value={userName} required className='input_name' placeholder='Name of user' type="text" />
+                <input onChange={(e => setPassword(e.target.value))} value={password} required className="input_password" placeholder='Password' type="password" />
                 
                 <div id='confirm'>
                     <button type='submit'>Confirm</button>

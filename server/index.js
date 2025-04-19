@@ -15,7 +15,7 @@ const app = express();
 
 export let ruta;
 
-const getOrigin = "produccion";
+const getOrigin = "local";
 
 if(getOrigin == "local") {
    ruta = 'http://localhost:5173';
@@ -28,6 +28,7 @@ if(getOrigin == "local") {
    ruta = path.resolve("client", "dist");
    app.use(express.static(ruta));
 }
+
 
 app.use(express.json())
 
@@ -42,6 +43,7 @@ app.use(cors({
 
 
 const server = http.createServer(app);
+
 export const io = new SocketServer(server, {
    cors: {
       origin: ruta,
@@ -49,6 +51,9 @@ export const io = new SocketServer(server, {
    }
 })
 
+app.get("/", (req, res)=>{
+   res.send("text")
+})
 
 app.use('/', mainRouter)
 
@@ -76,6 +81,7 @@ io.on("connection", socket =>{
    });
 
    socket.on("imReady", ()=>{
+
       const { user } = cookie.parse(socket.handshake.headers.cookie || "")
       const { room } = cookie.parse(socket.handshake.headers.cookie || "")
       CardTable.imReady({ title: room, user, socket, allSockets: io })
@@ -93,5 +99,7 @@ io.on("connection", socket =>{
 const PORT = process.env.PORT ?? 3000;
 
 server.listen(PORT, ()=>{
+
    console.log(`Servido inicializado en el puerto ${PORT}`);
+
 })
