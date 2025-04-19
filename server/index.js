@@ -15,18 +15,12 @@ const app = express();
 
 export let ruta;
 
-const getOrigin = "produccion";
+const inProduccion = true;
 
-if(getOrigin == "local") {
+if(inProduccion == false) {
    ruta = 'http://localhost:5173';
 
-} else if(getOrigin == "prueba"){
-   // ruta = 'http://localhost:5173';
-   // app.use(express.static(path.resolve("client", "dist")));
-
-} else if(getOrigin == "produccion"){
-   // ruta = path.resolve("client", "dist");
-   // app.use(express.static(ruta));
+} else {
    app.use(express.static(path.resolve("client", "dist")));
 }
 
